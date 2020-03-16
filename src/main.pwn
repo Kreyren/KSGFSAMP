@@ -205,7 +205,7 @@ CMD:tmpgate( playerid, params[] ) {
 			{
 				// If gate is closed
 				// CORE
-				if( GateInfo[gate][gStatus] == GATE_STATE_CLOSE )
+				if( GateInfo[gate][gStatus] == GATE_STATE_CLOSED )
 				{
 					SendClientMessage( playerid, -1, "Openning the gate for 5 seconds.." );
 					// Open the gate
