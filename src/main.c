@@ -182,7 +182,11 @@ CMD:removegate( playerid, params[] )
 CMD:tmpgate( playerid, params[] ) {
 	// Argument resolution
 	if( isnull( params ) )
-		return SendClientMessage( playerid, -1, "Syntax: /gopen [password]" );
+	{
+		return SendClientMessage( playerid, -1, "Syntax: /tmpgate [password]" );
+	} else {
+		return SendClientMessage( playerid, -1, "What the fuck" );
+	}
 }
 
 CMD:gateinfo( playerid, params[] )
@@ -334,4 +338,3 @@ stock CreateGate( playerid, password, Float:x, Float:y, Float:z, Float:a )
 			break;
 				}
     }
-}
