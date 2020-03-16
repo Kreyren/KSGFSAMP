@@ -9,6 +9,6 @@ RUN true \
   && cd pawn-compiler/source/compiler \
   && mkdir build \
   && cd build \
-  && cmake ../ -DCMAKE_C_FLAGS=-m32 -DCMAKE_BUILD_TYPE=Release \
+  && cmake ../ -DCMAKE_C_FLAGS="-m32" -DCMAKE_BUILD_TYPE=Release \
   && make \
   && sudo make install

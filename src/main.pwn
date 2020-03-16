@@ -1,6 +1,4 @@
 #include a_samp
-forward GateCheck();
-new AutomaticGate;
 #include zcmd
 #include Dini
 
@@ -182,52 +180,57 @@ CMD:removegate( playerid, params[] )
   This functions opens the nearest gate for 5 seconds and then closes it
 */
 CMD:tmpgate( playerid, params[] ) {
-	// Argument resolution
+	// Process arguments
 	if( isnull( params ) )
-	{
-		return SendClientMessage( playerid, -1, "Syntax: /tmpgate [password]" );
-	}
-
-	// Get stuff?
+	    return SendClientMessage( playerid, -1, "Syntax: /tmpgate [password]" );
+	    
+	// Get player name
 	new szName[24], gate = -1;
 	GetPlayerName( playerid, szName, 24 );
+
+	// Get gate metadata?
 	for( new i = 0; i != MAX_GATES; i++ )
 		if( GateInfo[i][gCreated] == 1 )
 			if( strval( params ) == GateInfo[i][gPassword] )
 				{ gate = i; break; }
 
-	// Gate resolution
+	// Process gate
 	if( gate != -1 )
 	{
-		// In case gate is moving?
-		if( !IsObjectMoving( GateInfo[gate][gObject] ) )
-		{
-			// Determine if player is in range of the gate?
-			if( IsPlayerInRangeOfPoint( playerid, 10.0, GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ] ) )
+	    if( !IsObjectMoving( GateInfo[gate][gObject] ) )
+	    {
+	    	if( IsPlayerInRangeOfPoint( playerid, 10.0, GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ] ) )
 			{
-				// If gate is closed
-				// CORE
-				if( GateInfo[gate][gStatus] == GATE_STATE_CLOSED )
-				{
-					SendClientMessage( playerid, -1, "Openning the gate for 5 seconds.." );
-					// Open the gate
-					MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]-5.3, 7.0 );
-					// Wait
-					settimer 2000;
-					// Close the gate
-					MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]+5.3, 7.0 );
+   				if( GateInfo[gate][gStatus] == GATE_STATE_CLOSED )
+	        	{
+							SendClientMessage( playerid, -1, "Openning gate for 5 seconds" );
+				    	MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]-5.3, 7.0 );
+
+							// Fuck you pawn, you can suck my dick, fuck your SetTimer function just like you!
+							for( new i = 0; i != 5000; i++ )
+							{
+								if ( i == 5000 )
+								{
+									MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]+5.3, 7.0 );
+									break;
+								}
+							}
 				}
+
 				else
-					return SendClientMessage( playerid, -1, "The gate is already openned." );
+	    			return SendClientMessage( playerid, -1, "The gate is already open." );
 			}
+
 			else
-				return SendClientMessage( playerid, -1, "You're not near any gate." );
-		}
-		else
-			return SendClientMessage( playerid, -1, "You must wait untill the gate has moved." );
+    			return SendClientMessage( playerid, -1, "You're not near any gate." );
+        }
+
+       	else
+	    	return SendClientMessage( playerid, -1, "You must wait untill the gate has moved." );
 	}
+
 	else
-		return SendClientMessage( playerid, -1, "Invalid password." );
+	    return SendClientMessage( playerid, -1, "Invalid password." );
 
 	return 1;
 }
@@ -380,4 +383,5 @@ stock CreateGate( playerid, password, Float:x, Float:y, Float:z, Float:a )
 			}
 			break;
 				}
-    }
+		}
+}
