@@ -186,12 +186,25 @@ CMD:tmpgate( playerid, params[] ) {
 		return SendClientMessage( playerid, -1, "Syntax: /tmpgate [password]" );
 	}
 
+	// Get stuff?
+	new szName[24], gate = -1;
+	GetPlayerName( playerid, szName, 24 );
+	for( new i = 0; i != MAX_GATES; i++ )
+		if( GateInfo[i][gCreated] == 1 )
+			if( strval( params ) == GateInfo[i][gPassword] )
+				{ gate = i; break; }
+
+	// Gate resolution
 	if( gate != -1 )
 	{
+		// In case gate is moving?
 		if( !IsObjectMoving( GateInfo[gate][gObject] ) )
 		{
+			// Determine if player is in range of the gate?
 			if( IsPlayerInRangeOfPoint( playerid, 10.0, GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ] ) )
 			{
+				// If gate is closed
+				// CORE
 				if( GateInfo[gate][gStatus] == GATE_STATE_CLOSE )
 				{
 					SendClientMessage( playerid, -1, "Openning the gate for 5 seconds.." );
@@ -203,7 +216,7 @@ CMD:tmpgate( playerid, params[] ) {
 					MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]+5.3, 7.0 );
 				}
 				else
-					return SendClientMessage( playerid, -1, "The gate is already closed." );
+					return SendClientMessage( playerid, -1, "The gate is already openned." );
 			}
 			else
 				return SendClientMessage( playerid, -1, "You're not near any gate." );
