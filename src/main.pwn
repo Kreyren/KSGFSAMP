@@ -206,7 +206,9 @@ CMD:tmpgate( playerid, params[] ) {
 						// Open the gate
 						MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]-5.3, 7.0 );
 						// Wait
+						SendClientMessage( playerid, -1, "Before" );
 						sleep 5;
+						SendClientMessage( playerid, -1, "After" );
 						// Close the gate
 						MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]+5.3, 7.0 );
 				}
