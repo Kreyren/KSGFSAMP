@@ -194,6 +194,40 @@ CMD:tmpgate( playerid, params[] ) {
 			if( strval( params ) == GateInfo[i][gPassword] )
 				{ gate = i; break; }
 
+	if( gate != -1 )
+	{
+	    if( !IsObjectMoving( GateInfo[gate][gObject] ) )
+	    {
+	    	if( IsPlayerInRangeOfPoint( playerid, 10.0, GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ] ) )
+			{
+   				if( GateInfo[gate][gStatus] == GATE_STATE_CLOSED )
+	        	{
+						SendClientMessage( playerid, -1, "Openning the gate for 5 seconds.." );
+						// Open the gate
+						MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]-5.3, 7.0 );
+						// Wait
+						sleep 5;
+						// Close the gate
+						MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]+5.3, 7.0 );
+				}
+
+				else
+	    			return SendClientMessage( playerid, -1, "The gate is already open." );
+			}
+
+			else
+    			return SendClientMessage( playerid, -1, "You're not near any gate." );
+        }
+
+       	else
+	    	return SendClientMessage( playerid, -1, "You must wait untill the gate has moved." );
+	}
+
+	else
+	    return SendClientMessage( playerid, -1, "Invalid password." );
+
+	return 1;
+
 	// Gate resolution
 	if( gate != -1 )
 	{
