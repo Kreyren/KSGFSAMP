@@ -2,4 +2,4 @@ image:
   file: gitpod/gitpod.Dockerfile
 vscode:
   extensions:
-    - Qoo.pawn@0.0.3:Ec0cru9FyDutuRzO3vckHg==
+    - dcealopez.pawn-scripting-language-support@0.0.5:FjAumsGoBatK/EhdbgqlFA==

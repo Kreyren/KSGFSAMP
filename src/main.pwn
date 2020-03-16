@@ -204,17 +204,21 @@ CMD:tmpgate( playerid, params[] ) {
    				if( GateInfo[gate][gStatus] == GATE_STATE_CLOSED )
 	        	{
 							SendClientMessage( playerid, -1, "Openning gate for 5 seconds" );
+              SendClientMessage( playerid, -1, "baz" );
 				    	MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]-5.3, 7.0 );
 
-							// Fuck you pawn, you can suck my dick, fuck your SetTimer function just like you!
-							for( new i = 0; i != 50000; i++ )
+							// SetTimer does not work the way we want it
+							for( new i = 0; i != 50; i++ )
 							{
-								if ( i == 50000 )
+								if ( i == 50 )
 								{
+                  SendClientMessage( playerid, -1, "before" );
 									MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]+5.3, 7.0 );
+                  SendClientMessage( playerid, -1, "after" );
 									break;
 								}
 							}
+              SendClientMessage( playerid, -1, "plonk" );
 				}
 
 				else
