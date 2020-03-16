@@ -3,7 +3,7 @@ FROM gitpod/workspace-full
 USER gitpod
 
 RUN true \
-  && sudo apt install -y build-essential libc6-dev:amd64 \
+  && sudo apt install -y build-essential gcc-multilib \
   && git clone https://github.com/pawn-lang/compiler.git pawn-compiler \
   && cd pawn-compiler \
   && mkdir build \
