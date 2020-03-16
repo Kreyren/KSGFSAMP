@@ -11,4 +11,4 @@ RUN true \
   && cd build \
   && cmake ../ -DCMAKE_C_FLAGS=-m32 -DCMAKE_BUILD_TYPE=Release \
   && make \
-  && make install
+  && sudo make install
