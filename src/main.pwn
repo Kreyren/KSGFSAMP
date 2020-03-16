@@ -207,9 +207,9 @@ CMD:tmpgate( playerid, params[] ) {
 				    	MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]-5.3, 7.0 );
 
 							// Fuck you pawn, you can suck my dick, fuck your SetTimer function just like you!
-							for( new i = 0; i != 5000; i++ )
+							for( new i = 0; i != 50000; i++ )
 							{
-								if ( i == 5000 )
+								if ( i == 50000 )
 								{
 									MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]+5.3, 7.0 );
 									break;
