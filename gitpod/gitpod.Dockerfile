@@ -4,7 +4,7 @@ USER gitpod
 
 RUN true \
   && sudo apt install -y build-essential gcc-multilib \
-  && git clone https://github.com/pawn-lang/compiler.git pawn-compiler \
+  && git clone --branch=dev https://github.com/pawn-lang/compiler.git pawn-compiler \
   && cd pawn-compiler \
   && mkdir build \
   && cd build \
