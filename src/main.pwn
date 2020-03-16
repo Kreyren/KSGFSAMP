@@ -1,7 +1,8 @@
 #include a_samp
+forward GateCheck();
+new AutomaticGate;
 #include zcmd
 #include Dini
-#include <time>
 
 #define MAX_GATES       		20
 #define GATE_OBJECT     		980
