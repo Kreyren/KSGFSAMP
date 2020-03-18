@@ -17,4 +17,4 @@ RUN true \
   && sudo apt-key add winehq.key \
   && sudo apt-add-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ $(cat /etc/os-release | grep "UBUNTU_CODENAME" | grep -oP "[^=]+$") main" \
   && sudo apt-get update \
-  && sudo apt-get install -y winehq-stable wine-stable
+  && sudo apt-get install -y wine-stable
