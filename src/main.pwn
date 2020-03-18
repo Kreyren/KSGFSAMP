@@ -6,13 +6,16 @@
 #define GATE_OBJECT     		980
 #define GATE_STATE_CLOSED   	0
 #define GATE_STATE_OPEN         1
+#define GATE_STATE_OPENING 2
+#define GATE_STATE_CLOSING 3
 
+forward CloseGate(gate); // for timed function
+forward CreateGate( playerid, password, Float:x, Float:y, Float:z, Float:a ); // for stuff
 
 /*
   FIXME-QA: Does things?
 */
-enum fs_gates
-{
+enum fs_gates {
 	gCreated,
 	Float:gX,
 	Float:gY,
@@ -177,13 +180,46 @@ CMD:removegate( playerid, params[] )
 }
 
 /*
+  This functions opens the nearest gate for 5 seconds and then closes it without the need for password
+*/
+// CMD:pwlesstmpgate(playerid) {
+// 	// Get player name
+// 	new szName[24], gate = -1;
+// 	GetPlayerName( playerid, szName, 24 );
+
+// 	// Get gate metadata?
+// 	for( new i = 0; i != MAX_GATES; i++ )
+// 		if( GateInfo[i][gCreated] == 1 )
+// 			{ gate = i; break; }
+
+// 	// If gate is moving
+// 		if( !IsObjectMoving( GateInfo[gate][gObject] ) ) {
+// 			// If player is in range of a gate
+// 			if( IsPlayerInRangeOfPoint( playerid, 10.0, GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ] ) ) {
+// 				// If gate is closed -> CORE
+// 				if( GateInfo[gate][gStatus] == GATE_STATE_CLOSED ) {
+// 					SendClientMessage( playerid, -1, "Openning gate for 5 seconds" );
+// 					MoveObject(GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]-5.3, 7.0);
+// 					GateInfo[gate][gStatus] = GATE_STATE_OPENING; // mark the gate as moving to open
+// 					return 0;
+// 				} else if( GateInfo[gate][gStatus] == GATE_STATE_OPEN ) {
+// 					return SendClientMessage( playerid, -1, "The gate is already open" );
+// 				} else
+// 					return SendClientMessage( playerid, -1, "This should never happend" );
+// 			} else
+// 				return SendClientMessage( playerid, -1, "You're not near any gate." );
+
+// 	return 255;
+// }
+
+/*
   This functions opens the nearest gate for 5 seconds and then closes it
 */
 CMD:tmpgate( playerid, params[] ) {
 	// Process arguments
 	if( isnull( params ) )
-	    return SendClientMessage( playerid, -1, "Syntax: /tmpgate [password]" );
-	    
+		return SendClientMessage( playerid, -1, "Syntax: /tmpgate [password]" );
+
 	// Get player name
 	new szName[24], gate = -1;
 	GetPlayerName( playerid, szName, 24 );
@@ -195,48 +231,30 @@ CMD:tmpgate( playerid, params[] ) {
 				{ gate = i; break; }
 
 	// Process gate
-	if( gate != -1 )
-	{
-	    if( !IsObjectMoving( GateInfo[gate][gObject] ) )
-	    {
-	    	if( IsPlayerInRangeOfPoint( playerid, 10.0, GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ] ) )
-			{
-   				if( GateInfo[gate][gStatus] == GATE_STATE_CLOSED )
-	        	{
-							SendClientMessage( playerid, -1, "Openning gate for 5 seconds" );
-              SendClientMessage( playerid, -1, "baz" );
-				    	MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]-5.3, 7.0 );
-
-							// SetTimer does not work the way we want it
-							for( new i = 0; i != 50; i++ )
-							{
-								if ( i == 50 )
-								{
-                  SendClientMessage( playerid, -1, "before" );
-									MoveObject( GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]+5.3, 7.0 );
-                  SendClientMessage( playerid, -1, "after" );
-									break;
-								}
-							}
-              SendClientMessage( playerid, -1, "plonk" );
-				}
-
-				else
-	    			return SendClientMessage( playerid, -1, "The gate is already open." );
-			}
-
-			else
-    			return SendClientMessage( playerid, -1, "You're not near any gate." );
-        }
-
-       	else
-	    	return SendClientMessage( playerid, -1, "You must wait untill the gate has moved." );
+	if( gate != -1 ) {
+		// If gate is moving
+		if( !IsObjectMoving( GateInfo[gate][gObject] ) ) {
+			// If player is in range of a gate
+			if( IsPlayerInRangeOfPoint( playerid, 10.0, GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ] ) ) {
+				// If gate is closed -> CORE
+				if( GateInfo[gate][gStatus] == GATE_STATE_CLOSED ) {
+					SendClientMessage( playerid, -1, "Openning gate for 5 seconds" );
+					MoveObject(GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]-5.3, 7.0);
+					GateInfo[gate][gStatus] = GATE_STATE_OPENING; // mark the gate as moving to open
+					return 0;
+				} else if( GateInfo[gate][gStatus] == GATE_STATE_OPEN ) {
+					return SendClientMessage( playerid, -1, "The gate is already open" );
+				} else
+					return SendClientMessage( playerid, -1, "This should never happend" );
+			} else
+				return SendClientMessage( playerid, -1, "You're not near any gate" );
+		}	else if( gate == -1 ) {
+			return SendClientMessage( playerid, -1, "Invalid password" );
+		} else
+			return SendClientMessage( playerid, -1, "BUG: This should never happend, in tmpgate processing gates" );
 	}
 
-	else
-	    return SendClientMessage( playerid, -1, "Invalid password." );
-
-	return 1;
+	return 255;
 }
 
 CMD:gateinfo( playerid, params[] )
@@ -325,57 +343,61 @@ public OnFilterScriptExit( )
 	return 1;
 }
 
-public OnObjectMoved( objectid )
-{
-	for( new i = 0; i != MAX_GATES; i++ )
-	{
-	    if( GateInfo[i][gCreated] == 1 )
-	    {
-	    	if( GateInfo[i][gObject] == objectid )
-	    	{
-	    	    if( GateInfo[i][gStatus] == GATE_STATE_CLOSED )
-	    	    	GateInfo[i][gStatus] = GATE_STATE_OPEN;
-				else if( GateInfo[i][gStatus] == GATE_STATE_OPEN )
-				    GateInfo[i][gStatus] = GATE_STATE_CLOSED;
+public OnObjectMoved( objectid ) {
+	// Check all gates
+	for( new i = 0; i != MAX_GATES; i++ ) {
+		// what
+		if( GateInfo[i][gCreated] == 1 ) {
+			// What
+			if( GateInfo[i][gObject] == objectid ) {
+				// the gate has finished opening
+				if( GateInfo[i][gStatus] == GATE_STATE_OPENING ) {
+					// mark the gate as open
+					GateInfo[i][gStatus] = GATE_STATE_OPEN;
+
+					// now set a 5 seconds timer to close it
+					SetTimerEx("CloseGate", 5000, false, "d", i);
+				} else if( GateInfo[i][gStatus] == GATE_STATE_CLOSING ) {
+					// mark the gate as closed
+					GateInfo[i][gStatus] = GATE_STATE_CLOSED;
+				}
 
 				// Update the variables.
 				new Float:oPos[3];
 				GetObjectPos( objectid, oPos[0], oPos[1], oPos[2] );
 				GateInfo[i][gX] = oPos[0];
-	        	GateInfo[i][gY] = oPos[1];
-	        	GateInfo[i][gZ] = oPos[2];
+				GateInfo[i][gY] = oPos[1];
+				GateInfo[i][gZ] = oPos[2];
 				break;
-            }
-        }
-    }
-    
-    return 1;
+			}
+		}
+	}
+
+	return 1;
 }
 
-stock CreateGate( playerid, password, Float:x, Float:y, Float:z, Float:a )
-{
-	for( new i = 0; i != MAX_GATES; i++ )
-	{
-	    if( GateInfo[i][gCreated] == 0 )
-	    {
+stock CreateGate( playerid, password, Float:x, Float:y, Float:z, Float:a ) {
+	// Check all gates
+	for( new i = 0; i != MAX_GATES; i++ ) {
+		if( GateInfo[i][gCreated] == 0 ) {
 			new szName[24];
 			GetPlayerName( playerid, szName, 24 );
 			
+			// ???
 			GateInfo[i][gObject] = CreateObject( GATE_OBJECT, x, y, z+1.5, 0, 0, a );
 			format( GateInfo[i][gPlacedBy], 24, "%s", szName );
-				GateInfo[i][gCreated] = 1;
-				GateInfo[i][gX] = x;
-				GateInfo[i][gY] = y;
-				GateInfo[i][gZ] = z+1.5; // comment the +1.5 if you're not using object 980.
-	        GateInfo[i][gA] = a;
+			GateInfo[i][gCreated] = 1;
+			GateInfo[i][gX] = x;
+			GateInfo[i][gY] = y;
+			GateInfo[i][gZ] = z+1.5; // comment the +1.5 if you're not using object 980.
+			GateInfo[i][gA] = a;
 			GateInfo[i][gStatus] = GATE_STATE_CLOSED;
 			GateInfo[i][gPassword] = password;
 			SetPlayerPos( playerid, x+1, y+1, z );
 			
 			new file[64];
-			format( file, 64, "Gates/gate_%d.ini", i );
-			if( !fexist( file ) )
-			{
+			format( file, 64, "Gates/gate_%d.ini", i);
+			if( !fexist( file ) ) {
 				dini_Create( file );
 				dini_IntSet( file, "Object", GateInfo[i][gObject] );
 				dini_FloatSet( file, "X", GateInfo[i][gX] );
@@ -386,6 +408,16 @@ stock CreateGate( playerid, password, Float:x, Float:y, Float:z, Float:a )
 				dini_Set( file, "PlacedBy", GateInfo[i][gPlacedBy] );
 			}
 			break;
-				}
 		}
+	}
+}
+
+// called 5 seconds by timer
+public CloseGate(gate) {
+	// the gate is open
+	if (GateInfo[gate][gStatus] == GATE_STATE_OPEN) {
+		// move the gate back to close
+		MoveObject(GateInfo[gate][gObject], GateInfo[gate][gX], GateInfo[gate][gY], GateInfo[gate][gZ]+5.3, 7.0);
+		GateInfo[gate][gStatus] = GATE_STATE_CLOSING;
+	}
 }
