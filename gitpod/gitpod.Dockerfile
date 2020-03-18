@@ -15,6 +15,6 @@ RUN true \
   && sudo dpkg --add-architecture i386 \
   && wget -nc https://dl.winehq.org/wine-builds/winehq.key \
   && sudo apt-key add winehq.key \
-  && sudo apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ $(cat /etc/os-release | grep "UBUNTU_CODENAME" | grep -oP "[^=]+$") main' \
+  && sudo apt-add-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ $(cat /etc/os-release | grep "UBUNTU_CODENAME" | grep -oP "[^=]+$") main" \
   && sudo apt-get update \
   && sudo apt-get install -y winehq-stable
